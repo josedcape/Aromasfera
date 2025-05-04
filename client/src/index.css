@@ -223,4 +223,147 @@
   .animate-float {
     animation: float 5s ease-in-out infinite;
   }
+  
+  /* Animations for splash screen particles */
+  @keyframes floatParticle {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+      transform: translate(50px, -30px) rotate(90deg);
+    }
+    50% {
+      transform: translate(100px, 0) rotate(180deg);
+    }
+    75% {
+      transform: translate(50px, 30px) rotate(270deg);
+    }
+    100% {
+      transform: translate(0, 0) rotate(360deg);
+    }
+  }
+  
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.7; }
+  }
+  
+  /* Special animations for intro screen */
+  @keyframes revealGradient {
+    0% { 
+      opacity: 0; 
+      transform: scale(0.8);
+    }
+    100% { 
+      opacity: 1; 
+      transform: scale(1);
+    }
+  }
+  
+  .animate-reveal-gradient {
+    animation: revealGradient 1.2s ease-out forwards;
+  }
+  
+  @keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+  }
+  
+  @keyframes slideIn {
+    0% {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-slide-in {
+    animation: slideIn 0.8s ease-out forwards;
+  }
+  
+  @keyframes zoomBounce {
+    0% {
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.95);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .animate-zoom-bounce {
+    animation: zoomBounce 0.8s ease-out forwards;
+  }
+  
+  /* Shining effects */
+  @keyframes shine {
+    0% {
+      background-position: -100% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  .shine-effect {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shine 3s linear infinite;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  
+  /* Ripple animation */
+  @keyframes ripple {
+    0% {
+      transform: scale(0);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+  
+  .ripple {
+    animation: ripple 1.5s ease-out;
+  }
+  
+  /* Pulse animation for dots */
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: scale(2);
+      opacity: 0.7;
+    }
+  }
 }
