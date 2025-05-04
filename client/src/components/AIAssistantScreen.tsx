@@ -395,49 +395,50 @@ export default function AIAssistantScreen({
   };
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 text-white">
       {/* Header */}
-      <header className="bg-primary text-white py-4 px-5 flex items-center justify-between">
+      <header className="bg-black/30 backdrop-blur-md border-b border-gray-700/50 py-4 px-5 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center">
-          <button onClick={onBack} className="mr-3">
+          <button onClick={onBack} className="mr-3 hover:bg-white/10 p-2 rounded-full transition-all">
             <RemixIcon name="arrow-left-line" size="xl" />
           </button>
-          <h1 className="font-heading text-xl">ScentBot</h1>
+          <div className="flex flex-col">
+            <h1 className="font-heading text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">AromaSfera AI</h1>
+            <span className="text-xs text-gray-400">Tu asistente de fragancias personal</span>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <button className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20">
+        <div className="flex items-center space-x-3">
+          <button className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors border border-gray-600">
             <RemixIcon name="question-line" />
           </button>
-          <button className="w-8 h-8 overflow-hidden rounded-full bg-white/20">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
-            </svg>
-          </button>
+          <div className="w-9 h-9 overflow-hidden rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+            <RemixIcon name="user-line" size="lg" />
+          </div>
         </div>
       </header>
 
       {/* Chat Area */}
-      <div ref={chatAreaRef} className="flex-1 overflow-y-auto p-4 bg-neutral-light">
+      <div ref={chatAreaRef} className="flex-1 overflow-y-auto p-4 bg-transparent">
         {messages.map((message, index) => (
-          <div key={index} className="mb-4">
+          <div key={index} className="mb-5">
             {message.sender === "assistant" ? (
-              <div className="flex">
-                <div className="w-10 h-10 rounded-full bg-primary flex-shrink-0 flex items-center justify-center">
+              <div className="flex items-start animate-fadeIn">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-blue-400/30">
                   <RemixIcon name="robot-line" className="text-white" />
                 </div>
-                <div className="ml-3 bg-white p-3 rounded-lg rounded-tl-none max-w-[75%] shadow-sm">
-                  <p className="text-sm">{message.text}</p>
+                <div className="ml-3 bg-black/30 backdrop-blur-md p-4 rounded-2xl rounded-tl-none max-w-[80%] shadow-xl border border-gray-700/50 group hover:border-blue-500/50 transition-all">
+                  <p className="text-sm leading-relaxed">{message.text}</p>
+                  <span className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">AromaSfera AI • {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
               </div>
             ) : (
-              <div className="flex justify-end">
-                <div className="mr-3 bg-primary text-white p-3 rounded-lg rounded-tr-none max-w-[75%]">
-                  <p className="text-sm">{message.text}</p>
+              <div className="flex justify-end items-start animate-fadeInRight">
+                <div className="mr-3 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 backdrop-blur-md p-4 rounded-2xl rounded-tr-none max-w-[75%] border border-purple-500/30 shadow-lg group hover:border-purple-400/50 transition-all">
+                  <p className="text-sm leading-relaxed">{message.text}</p>
+                  <span className="text-xs text-gray-500 text-right block opacity-0 group-hover:opacity-100 transition-opacity">Tú • {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-neutral-200 flex-shrink-0 overflow-hidden">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
-                  </svg>
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0 overflow-hidden shadow-lg shadow-purple-500/20 border border-purple-400/30 flex items-center justify-center">
+                  <RemixIcon name="user-line" size="lg" className="text-white" />
                 </div>
               </div>
             )}
@@ -446,43 +447,80 @@ export default function AIAssistantScreen({
             {message.sender === "assistant" && 
              message.options && 
              index === messages.length - 1 && (
-              <div className="pl-12 mb-4 mt-2">
-                <div className={`grid ${message.type === "fragrance" || message.type === "occasion" ? "grid-cols-2" : "grid-cols-2"} gap-2`}>
-                  {message.options.map((option, optIndex) => (
-                    <button 
-                      key={optIndex}
-                      className={`bg-white p-2 rounded-md text-sm border border-neutral-200 hover:bg-primary hover:text-white transition ${
-                        message.type === "fragrance" || message.type === "occasion" ? "flex flex-col items-center" : ""
-                      }`}
-                      onClick={() => handleOptionClick(option)}
-                    >
-                      {(message.type === "fragrance") && (
-                        <RemixIcon 
-                          name={
-                            option === "Fresh" ? "leaf-line" : 
-                            option === "Floral" ? "flower-line" : 
-                            option === "Woody" ? "home-8-line" : 
-                            "sun-line"
-                          } 
-                          size="lg" 
-                          className="mb-1" 
-                        />
-                      )}
-                      {(message.type === "occasion") && (
-                        <RemixIcon 
-                          name={
-                            option === "Everyday" ? "sun-line" : 
-                            option === "Work" ? "briefcase-line" : 
-                            option === "Date" ? "heart-line" : 
-                            "gift-line"
-                          } 
-                          size="lg" 
-                          className="mb-1" 
-                        />
-                      )}
-                      <span>{option}</span>
-                    </button>
-                  ))}
+              <div className="ml-14 mb-4 mt-3 animate-fadeIn">
+                <div className={`grid ${message.type === "fragrance" || message.type === "occasion" ? "grid-cols-2" : "grid-cols-2"} gap-3`}>
+                  {message.options.map((option, optIndex) => {
+                    // Determinar gradientes de color según el tipo
+                    let gradientFrom, gradientTo, iconColor;
+                    
+                    if (message.type === "fragrance") {
+                      if (option === "Fresh") {
+                        gradientFrom = "from-green-500"; gradientTo = "to-teal-400"; iconColor = "text-green-300";
+                      } else if (option === "Floral") {
+                        gradientFrom = "from-pink-500"; gradientTo = "to-purple-400"; iconColor = "text-pink-300";
+                      } else if (option === "Woody") {
+                        gradientFrom = "from-amber-500"; gradientTo = "to-yellow-400"; iconColor = "text-amber-300";
+                      } else {
+                        gradientFrom = "from-red-500"; gradientTo = "to-orange-400"; iconColor = "text-red-300";
+                      }
+                    } else if (message.type === "occasion") {
+                      if (option === "Everyday") {
+                        gradientFrom = "from-blue-500"; gradientTo = "to-cyan-400"; iconColor = "text-blue-300";
+                      } else if (option === "Work") {
+                        gradientFrom = "from-indigo-500"; gradientTo = "to-blue-400"; iconColor = "text-indigo-300";
+                      } else if (option === "Date") {
+                        gradientFrom = "from-pink-500"; gradientTo = "to-red-400"; iconColor = "text-pink-300";
+                      } else {
+                        gradientFrom = "from-purple-500"; gradientTo = "to-violet-400"; iconColor = "text-purple-300";
+                      }
+                    } else {
+                      // Opciones genéricas
+                      const colors = [
+                        { from: "from-blue-500", to: "to-cyan-400", icon: "text-blue-300" },
+                        { from: "from-purple-500", to: "to-violet-400", icon: "text-purple-300" },
+                        { from: "from-pink-500", to: "to-rose-400", icon: "text-pink-300" },
+                        { from: "from-indigo-500", to: "to-blue-400", icon: "text-indigo-300" }
+                      ];
+                      const colorSet = colors[optIndex % colors.length];
+                      gradientFrom = colorSet.from;
+                      gradientTo = colorSet.to;
+                      iconColor = colorSet.icon;
+                    }
+
+                    return (
+                      <button 
+                        key={optIndex}
+                        className={`bg-black/30 backdrop-blur-md p-3 rounded-xl text-sm border border-gray-700 hover:border-blue-500/50 transition-all 
+                        hover:shadow-lg hover:shadow-${gradientFrom.replace("from-", "")}/20 hover:scale-105 
+                        ${message.type === "fragrance" || message.type === "occasion" ? "flex flex-col items-center" : ""}`}
+                        onClick={() => handleOptionClick(option)}
+                      >
+                        {(message.type === "fragrance" || message.type === "occasion") && (
+                          <div className={`w-10 h-10 rounded-full mb-2 flex items-center justify-center bg-gradient-to-br ${gradientFrom} ${gradientTo} shadow-md shadow-${gradientFrom.replace("from-", "")}/20`}>
+                            <RemixIcon 
+                              name={
+                                // Fragance icons
+                                message.type === "fragrance" && option === "Fresh" ? "leaf-line" : 
+                                message.type === "fragrance" && option === "Floral" ? "flower-line" : 
+                                message.type === "fragrance" && option === "Woody" ? "home-8-line" : 
+                                message.type === "fragrance" && option === "Oriental" ? "sun-line" :
+                                // Occasion icons
+                                message.type === "occasion" && option === "Everyday" ? "sun-line" : 
+                                message.type === "occasion" && option === "Work" ? "briefcase-line" : 
+                                message.type === "occasion" && option === "Date" ? "heart-line" : 
+                                message.type === "occasion" && option === "Special Event" ? "gift-line" :
+                                // Default
+                                "check-line"
+                              } 
+                              size="lg" 
+                              className="text-white" 
+                            />
+                          </div>
+                        )}
+                        <span className={`text-white font-medium bg-gradient-to-r ${gradientFrom} ${gradientTo} bg-clip-text text-transparent`}>{option}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -491,18 +529,23 @@ export default function AIAssistantScreen({
 
         {/* Voice Input Indicator */}
         {isListening && (
-          <div className="flex mb-4 items-center">
-            <div className="w-10 h-10 rounded-full bg-primary flex-shrink-0 flex items-center justify-center pulse">
-              <RemixIcon name="mic-line" className="text-white" />
+          <div className="flex mb-4 items-center animate-pulse">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-red-500 flex-shrink-0 flex items-center justify-center shadow-lg shadow-pink-500/30 border border-pink-400/30">
+              <RemixIcon name="mic-line" className="text-white text-lg animate-pulse" />
             </div>
-            <div className="ml-3 bg-white p-3 rounded-lg rounded-tl-none shadow-sm flex items-center">
-              <p className="text-sm mr-3">Listening...</p>
-              <div className="flex items-end space-x-1 h-5">
-                <div className="wave-bar bg-primary w-1 h-1 rounded-full"></div>
-                <div className="wave-bar bg-primary w-1 h-1 rounded-full"></div>
-                <div className="wave-bar bg-primary w-1 h-1 rounded-full"></div>
-                <div className="wave-bar bg-primary w-1 h-1 rounded-full"></div>
-                <div className="wave-bar bg-primary w-1 h-1 rounded-full"></div>
+            <div className="ml-3 bg-black/40 backdrop-blur-md p-4 rounded-2xl rounded-tl-none border border-pink-500/30 flex items-center shadow-lg">
+              <p className="text-sm mr-4 text-white font-medium">Escuchando<span className="dot-typing"></span></p>
+              <div className="flex items-end space-x-1 h-6">
+                {[1, 2, 3, 4, 5].map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="audio-wave bg-gradient-to-t from-pink-500 to-purple-500 w-1.5 rounded-full"
+                    style={{ 
+                      height: `${Math.max(4, Math.floor(Math.random() * 24))}px`,
+                      animationDelay: `${i * 0.1}s`
+                    }}
+                  ></div>
+                ))}
               </div>
             </div>
           </div>
@@ -510,27 +553,40 @@ export default function AIAssistantScreen({
       </div>
 
       {/* Input Area */}
-      <div className="bg-white border-t border-neutral-200 p-3">
-        <form onSubmit={handleSubmit} className="flex items-center">
-          <button type="button" className="p-2 text-neutral-medium">
+      <div className="bg-gray-900/60 backdrop-blur-md border-t border-gray-700/50 p-4 sticky bottom-0 z-10">
+        <form onSubmit={handleSubmit} className="flex items-center relative">
+          <button type="button" className="p-2 text-gray-400 hover:text-purple-400 transition-colors">
             <RemixIcon name="emotion-line" size="xl" />
           </button>
-          <div className="flex-1 bg-neutral-light rounded-full px-4 py-2 mx-2 flex items-center">
+          <div className="flex-1 bg-black/30 rounded-2xl border border-gray-700 px-4 py-3 mx-2 flex items-center focus-within:border-blue-500/50 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"></div>
             <input 
               type="text" 
-              placeholder="Type a message or tap microphone" 
-              className="bg-transparent w-full focus:outline-none text-sm"
+              placeholder="Escribe tu mensaje o usa el micrófono..." 
+              className="bg-transparent w-full focus:outline-none text-sm text-white z-10"
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}
             />
           </div>
-          <button 
-            type="button" 
-            className="p-2 text-primary"
-            onClick={handleVoiceInput}
-          >
-            <RemixIcon name="mic-line" size="xl" />
-          </button>
+          {currentInput.trim() ? (
+            <button 
+              type="submit" 
+              className="p-3 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 border border-blue-400/30 hover:shadow-blue-500/50 hover:scale-105 transition-all"
+            >
+              <RemixIcon name="send-plane-fill" size="lg" />
+            </button>
+          ) : (
+            <button 
+              type="button" 
+              className={`p-3 rounded-full ${isListening 
+                ? 'bg-gradient-to-br from-pink-500 to-red-500 shadow-lg shadow-pink-500/30 border border-pink-400/30 text-white animate-pulse' 
+                : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 border border-blue-400/30 text-white hover:shadow-blue-500/50 hover:scale-105'
+              } transition-all`}
+              onClick={handleVoiceInput}
+            >
+              <RemixIcon name="mic-line" size="lg" />
+            </button>
+          )}
         </form>
       </div>
     </div>
