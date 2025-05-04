@@ -103,7 +103,7 @@ export default function AIAssistantScreen({
   // Inicializar chat con el primer mensaje
   useEffect(() => {
     if (messages.length === 0) {
-      const initialMessage = {
+      const initialMessage: Message = {
         sender: "assistant",
         text: steps[0].question,
         type: steps[0].type as any
@@ -188,10 +188,12 @@ export default function AIAssistantScreen({
       
       if (result && result.audioUrl) {
         audioElement.src = result.audioUrl;
-        audioElement.play();
+        audioElement.play().catch(err => {
+          console.error("Error al reproducir audio:", err);
+        });
       }
     } catch (error) {
-      console.error("Error al reproducir la respuesta:", error);
+      console.error("Error al convertir texto a voz:", error);
     }
   };
   
@@ -318,9 +320,12 @@ export default function AIAssistantScreen({
     } else {
       // Al finalizar, obtener preferencias analizadas
       try {
-        const analyzedPreferences = await analyzeUserPreferences(
-          conversation.filter(msg => msg.role === 'user').map(msg => msg.content)
-        );
+        // Extraer solo los mensajes del usuario para el análisis
+        const userMessages = conversation
+          .filter(msg => msg.role === 'user')
+          .map(msg => msg.content);
+          
+        const analyzedPreferences = await analyzeUserPreferences(userMessages);
         
         // Combinar preferencias detectadas con las que el usuario ya seleccionó
         const finalPreferences = {

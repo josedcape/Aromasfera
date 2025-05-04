@@ -51,7 +51,7 @@ export async function sendMessageToAssistant(
  * @returns Preferencias del usuario
  */
 export async function analyzeUserPreferences(
-  messages: ConversationMessage[]
+  messages: string[]
 ): Promise<UserPreferences> {
   try {
     const response = await apiRequest({
@@ -78,7 +78,7 @@ export async function analyzeUserPreferences(
 export async function textToSpeech(
   text: string,
   language: string = 'es-ES'
-): Promise<string> {
+): Promise<{ audioUrl: string }> {
   try {
     const response = await apiRequest({
       url: '/api/assistant/speak',
@@ -90,7 +90,7 @@ export async function textToSpeech(
     });
 
     const typedResponse = response as { audioUrl: string };
-    return typedResponse.audioUrl;
+    return typedResponse;
   } catch (error) {
     console.error('Error al convertir texto a voz:', error);
     throw error;
