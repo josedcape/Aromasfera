@@ -395,23 +395,31 @@ export default function AIAssistantScreen({
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-gray-900 to-gray-800 text-white relative overflow-hidden">
+      {/* Background effect */}
+      <div className="absolute inset-0 bg-shimmer opacity-30 pointer-events-none"></div>
+      
       {/* Header */}
-      <header className="bg-black/30 backdrop-blur-md border-b border-gray-700/50 py-4 px-5 flex items-center justify-between sticky top-0 z-10">
+      <header className="bg-black/40 backdrop-blur-md border-b border-gray-700/50 py-4 px-5 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center">
-          <button onClick={onBack} className="mr-3 hover:bg-white/10 p-2 rounded-full transition-all">
+          <button 
+            onClick={onBack} 
+            className="mr-3 hover:bg-white/10 p-2 rounded-full transition-all hover:scale-105"
+          >
             <RemixIcon name="arrow-left-line" size="xl" />
           </button>
           <div className="flex flex-col">
-            <h1 className="font-heading text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">AromaSfera AI</h1>
+            <h1 className="font-heading text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              AromaSfera AI
+            </h1>
             <span className="text-xs text-gray-400">Tu asistente de fragancias personal</span>
           </div>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors border border-gray-600">
+          <button className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-700/50 hover:bg-gray-600/50 transition-colors border border-gray-600 hover:border-blue-500/50 hover:scale-105">
             <RemixIcon name="question-line" />
           </button>
-          <div className="w-9 h-9 overflow-hidden rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
+          <div className="w-9 h-9 overflow-hidden rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center border border-purple-400/30 shadow-lg shadow-purple-500/20 animate-float">
             <RemixIcon name="user-line" size="lg" />
           </div>
         </div>
@@ -553,41 +561,64 @@ export default function AIAssistantScreen({
       </div>
 
       {/* Input Area */}
-      <div className="bg-gray-900/60 backdrop-blur-md border-t border-gray-700/50 p-4 sticky bottom-0 z-10">
-        <form onSubmit={handleSubmit} className="flex items-center relative">
-          <button type="button" className="p-2 text-gray-400 hover:text-purple-400 transition-colors">
-            <RemixIcon name="emotion-line" size="xl" />
-          </button>
-          <div className="flex-1 bg-black/30 rounded-2xl border border-gray-700 px-4 py-3 mx-2 flex items-center focus-within:border-blue-500/50 transition-colors group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"></div>
-            <input 
-              type="text" 
-              placeholder="Escribe tu mensaje o usa el micrófono..." 
-              className="bg-transparent w-full focus:outline-none text-sm text-white z-10"
-              value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-            />
-          </div>
-          {currentInput.trim() ? (
-            <button 
-              type="submit" 
-              className="p-3 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 border border-blue-400/30 hover:shadow-blue-500/50 hover:scale-105 transition-all"
-            >
-              <RemixIcon name="send-plane-fill" size="lg" />
-            </button>
-          ) : (
+      <div className="bg-gray-900/70 backdrop-blur-md border-t border-gray-700/50 p-4 sticky bottom-0 z-10">
+        <div className="max-w-3xl mx-auto">
+          <form onSubmit={handleSubmit} className="flex items-center relative">
             <button 
               type="button" 
-              className={`p-3 rounded-full ${isListening 
-                ? 'bg-gradient-to-br from-pink-500 to-red-500 shadow-lg shadow-pink-500/30 border border-pink-400/30 text-white animate-pulse' 
-                : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 border border-blue-400/30 text-white hover:shadow-blue-500/50 hover:scale-105'
-              } transition-all`}
-              onClick={handleVoiceInput}
+              className="p-2 text-gray-400 hover:text-purple-400 transition-colors rounded-full hover:bg-gray-800/50"
             >
-              <RemixIcon name="mic-line" size="lg" />
+              <RemixIcon name="emotion-line" size="xl" />
             </button>
-          )}
-        </form>
+            
+            {/* Input field with glowing effect */}
+            <div className="flex-1 bg-black/30 rounded-2xl border border-gray-700 px-4 py-3 mx-2 flex items-center focus-within:border-blue-500/50 transition-all group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"></div>
+              
+              {/* Glowing border effect when focused */}
+              <div className="absolute inset-0 rounded-2xl border border-blue-500/70 opacity-0 group-focus-within:opacity-100 transition-opacity border-glow"></div>
+              
+              <RemixIcon name="message-3-line" className="text-gray-500 mr-2" />
+              <input 
+                type="text" 
+                placeholder="Escribe tu mensaje o usa el micrófono..." 
+                className="bg-transparent w-full focus:outline-none text-sm text-white z-10"
+                value={currentInput}
+                onChange={(e) => setCurrentInput(e.target.value)}
+              />
+            </div>
+            
+            {/* Send button with animations */}
+            {currentInput.trim() ? (
+              <button 
+                type="submit" 
+                className="p-3 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 border border-blue-400/30 hover:shadow-blue-500/50 hover:scale-105 transition-all relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 sheen-effect opacity-0 group-hover:opacity-100"></div>
+                <RemixIcon name="send-plane-fill" size="lg" className="z-10 relative" />
+              </button>
+            ) : (
+              <button 
+                type="button" 
+                className={`p-3 rounded-full relative overflow-hidden ${isListening 
+                  ? 'bg-gradient-to-br from-pink-500 to-red-500 shadow-lg shadow-pink-500/30 border border-pink-400/30 text-white animate-pulse' 
+                  : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 border border-blue-400/30 text-white hover:shadow-blue-500/50 hover:scale-105 group'
+                } transition-all`}
+                onClick={handleVoiceInput}
+              >
+                {!isListening && <div className="absolute inset-0 sheen-effect opacity-0 group-hover:opacity-100"></div>}
+                <RemixIcon name="mic-line" size="lg" className="z-10 relative" />
+              </button>
+            )}
+          </form>
+          
+          {/* Small hint text */}
+          <div className="text-center mt-2">
+            <p className="text-xs text-gray-500">
+              Habla o escribe con AromaSfera para descubrir tu perfume ideal
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
