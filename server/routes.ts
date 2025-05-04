@@ -18,8 +18,9 @@ import path from 'path';
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   
-  // Servir archivos estáticos de audio
+  // Servir archivos estáticos de audio e imágenes
   app.use('/audio', express.static(path.join(import.meta.dirname, 'public', 'audio')));
+  app.use('/images', express.static(path.join(import.meta.dirname, 'public', 'images')));
   
   // Get perfume recommendations based on user preferences
   app.get('/api/recommendations', async (req, res) => {
