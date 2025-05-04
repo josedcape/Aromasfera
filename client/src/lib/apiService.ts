@@ -29,16 +29,17 @@ export async function sendMessageToAssistant(
   currentStep: number
 ): Promise<AssistantResponse> {
   try {
-    const response = await apiRequest({
-      url: '/api/assistant/message',
-      method: 'POST',
-      body: {
+    const response = await apiRequest(
+      'POST',
+      '/api/assistant/message',
+      {
         conversation,
         currentStep
-      },
-    });
+      }
+    );
 
-    return response as AssistantResponse;
+    const data = await response.json();
+    return data as AssistantResponse;
   } catch (error) {
     console.error('Error al enviar mensaje al asistente:', error);
     throw error;
@@ -54,15 +55,16 @@ export async function analyzeUserPreferences(
   messages: string[]
 ): Promise<UserPreferences> {
   try {
-    const response = await apiRequest({
-      url: '/api/assistant/analyze',
-      method: 'POST',
-      body: {
+    const response = await apiRequest(
+      'POST',
+      '/api/assistant/analyze',
+      {
         messages
-      },
-    });
+      }
+    );
 
-    return response as UserPreferences;
+    const data = await response.json();
+    return data as UserPreferences;
   } catch (error) {
     console.error('Error al analizar preferencias del usuario:', error);
     throw error;
@@ -80,17 +82,17 @@ export async function textToSpeech(
   language: string = 'es-ES'
 ): Promise<{ audioUrl: string }> {
   try {
-    const response = await apiRequest({
-      url: '/api/assistant/speak',
-      method: 'POST',
-      body: {
+    const response = await apiRequest(
+      'POST',
+      '/api/assistant/speak',
+      {
         text,
         language
-      },
-    });
+      }
+    );
 
-    const typedResponse = response as { audioUrl: string };
-    return typedResponse;
+    const data = await response.json();
+    return data as { audioUrl: string };
   } catch (error) {
     console.error('Error al convertir texto a voz:', error);
     throw error;
