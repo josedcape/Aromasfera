@@ -40,24 +40,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Apply filters if they exist
       if (gender) {
-        query = query.where(inArray(gender, perfumes.gender));
+        query = query.where(gender === 'men' ? 
+          inArray(perfumes.gender, ['men', 'unisex']) : 
+          inArray(perfumes.gender, ['women', 'unisex'])
+        );
       }
       
       if (fragranceTypes) {
         const types = fragranceTypes.split(',');
-        const conditions = types.map(type => inArray(type, perfumes.fragrance_type));
-        
-        if (conditions.length > 0) {
-          query = query.where(or(...conditions));
+        if (types.length > 0) {
+          // Al menos uno de los tipos de fragancia
+          query = query.where(or(...types.map(type => 
+            inArray(perfumes.fragrance_type, [type])
+          )));
         }
       }
       
       if (occasions) {
         const occasionList = occasions.split(',');
-        const conditions = occasionList.map(occasion => inArray(occasion, perfumes.occasions));
-        
-        if (conditions.length > 0) {
-          query = query.where(or(...conditions));
+        if (occasionList.length > 0) {
+          // Al menos una de las ocasiones
+          query = query.where(or(...occasionList.map(occasion => 
+            inArray(perfumes.occasions, [occasion])
+          )));
         }
       }
       
@@ -177,10 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/assistant/analyze', async (req, res) => {
     try {
       const schema = z.object({
-        messages: z.array(z.object({
-          role: z.enum(['user', 'assistant']),
-          content: z.string()
-        }))
+        messages: z.array(z.string())
       });
       
       const parsed = schema.safeParse(req.body);
@@ -194,13 +196,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { messages } = parsed.data;
       
-      // Extraer solo los mensajes del usuario
-      const userMessages = messages
-        .filter(msg => msg.role === 'user')
-        .map(msg => msg.content);
-      
       // Analizar preferencias usando el servicio de AI
-      const preferences = await analyzeUserPreferences(userMessages);
+      const preferences = await analyzeUserPreferences(messages);
       
       res.json(preferences);
     } catch (error) {
