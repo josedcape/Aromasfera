@@ -7,7 +7,12 @@ import {
   Occasion 
 } from "@/lib/utils";
 import { useSpeechRecognition } from "@/lib/speechRecognition";
-import { sendMessageToAssistant, textToSpeech, ConversationMessage } from "@/lib/apiService";
+import { 
+  sendMessageToAssistant, 
+  textToSpeech, 
+  analyzeUserPreferences, 
+  ConversationMessage 
+} from "@/lib/apiService";
 
 type Message = {
   sender: "user" | "assistant";
@@ -32,7 +37,19 @@ export default function AIAssistantScreen({
   const [currentInput, setCurrentInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [conversation, setConversation] = useState<ConversationMessage[]>([]);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const chatAreaRef = useRef<HTMLDivElement>(null);
+  
+  // Inicializar el reconocimiento de voz
+  const { 
+    transcript, 
+    isListening: isSpeechListening, 
+    startListening, 
+    stopListening,
+    setTranscript 
+  } = useSpeechRecognition("es-ES");
 
   const steps = [
     {
@@ -70,30 +87,88 @@ export default function AIAssistantScreen({
     }
   ];
 
-  // Initialize chat with first message
+  // Inicializar audio element
+  useEffect(() => {
+    const audio = new Audio();
+    setAudioElement(audio);
+    
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.src = '';
+      }
+    };
+  }, []);
+  
+  // Inicializar chat con el primer mensaje
   useEffect(() => {
     if (messages.length === 0) {
-      setMessages([
-        {
-          sender: "assistant",
-          text: steps[0].question,
-          type: steps[0].type as any
-        }
-      ]);
+      const initialMessage = {
+        sender: "assistant",
+        text: steps[0].question,
+        type: steps[0].type as any
+      };
       
-      // Add the next question after a delay
-      setTimeout(() => {
-        setMessages(prev => [
-          ...prev,
-          {
-            sender: "assistant",
-            text: steps[1].question,
-            options: steps[1].options,
-            type: steps[1].type as any
+      setMessages([initialMessage]);
+      setConversation([{ role: 'assistant', content: steps[0].question }]);
+      
+      // Convertir texto a voz
+      playAssistantResponse(steps[0].question);
+      
+      // Agregar la siguiente pregunta después de un retraso
+      setTimeout(async () => {
+        try {
+          // En lugar de usar steps predefinidos, intentamos obtener la pregunta del asistente
+          const nextQuestion = await getNextQuestion();
+          
+          if (nextQuestion) {
+            setMessages(prev => [
+              ...prev,
+              {
+                sender: "assistant",
+                text: nextQuestion.text,
+                options: nextQuestion.suggestedResponses,
+                type: steps[1].type as any
+              }
+            ]);
+            
+            setConversation(prev => [...prev, { role: 'assistant', content: nextQuestion.text }]);
+            playAssistantResponse(nextQuestion.text);
+          } else {
+            // Si no se pudo obtener una respuesta del asistente, usar los steps predefinidos
+            setMessages(prev => [
+              ...prev,
+              {
+                sender: "assistant",
+                text: steps[1].question,
+                options: steps[1].options,
+                type: steps[1].type as any
+              }
+            ]);
+            
+            setConversation(prev => [...prev, { role: 'assistant', content: steps[1].question }]);
+            playAssistantResponse(steps[1].question);
           }
-        ]);
-        setCurrentStep(1);
-      }, 1000);
+          
+          setCurrentStep(1);
+        } catch (error) {
+          console.error("Error al obtener la siguiente pregunta:", error);
+          
+          // Si hay un error, usar los steps predefinidos
+          setMessages(prev => [
+            ...prev,
+            {
+              sender: "assistant",
+              text: steps[1].question,
+              options: steps[1].options,
+              type: steps[1].type as any
+            }
+          ]);
+          
+          setConversation(prev => [...prev, { role: 'assistant', content: steps[1].question }]);
+          setCurrentStep(1);
+        }
+      }, 2000);
     }
   }, []);
 
@@ -104,47 +179,128 @@ export default function AIAssistantScreen({
     }
   }, [messages]);
 
-  const handleVoiceInput = () => {
-    setIsListening(!isListening);
+  // Función para reproducir la respuesta del asistente (text-to-speech)
+  const playAssistantResponse = async (text: string) => {
+    try {
+      if (!audioElement) return;
+      
+      const result = await textToSpeech(text);
+      
+      if (result && result.audioUrl) {
+        audioElement.src = result.audioUrl;
+        audioElement.play();
+      }
+    } catch (error) {
+      console.error("Error al reproducir la respuesta:", error);
+    }
+  };
+  
+  // Función para obtener la siguiente pregunta del asistente
+  const getNextQuestion = async () => {
+    try {
+      setIsProcessing(true);
+      const response = await sendMessageToAssistant(conversation, currentStep);
+      setIsProcessing(false);
+      return response;
+    } catch (error) {
+      console.error("Error al obtener la respuesta del asistente:", error);
+      setIsProcessing(false);
+      return null;
+    }
+  };
+  
+  // Efecto para monitorear los cambios en el reconocimiento de voz
+  useEffect(() => {
+    if (transcript.trim()) {
+      setCurrentInput(transcript);
+    }
+  }, [transcript]);
+
+  // Efecto para monitorear cuando cambia el estado de escucha
+  useEffect(() => {
+    setIsListening(isSpeechListening);
     
-    if (!isListening) {
-      // Simulate voice recognition after 3 seconds
-      setTimeout(() => {
-        const simulatedResponse = getSimulatedResponse(currentStep);
-        handleUserResponse(simulatedResponse);
-        setIsListening(false);
-      }, 3000);
+    // Cuando termina de escuchar, enviar la respuesta si hay texto
+    if (!isSpeechListening && currentInput.trim()) {
+      handleUserResponse(currentInput);
+      setCurrentInput("");
+      setTranscript("");
+    }
+  }, [isSpeechListening]);
+  
+  // Activar/desactivar reconocimiento de voz
+  const handleVoiceInput = () => {
+    if (isListening) {
+      // Detener el reconocimiento de voz
+      stopListening();
+    } else {
+      // Iniciar el reconocimiento de voz
+      startListening();
     }
   };
 
-  const getSimulatedResponse = (step: number): string => {
-    // Simulate user responses based on the current step
-    const responses = [
-      "",
-      "25-34",
-      "Woody",
-      "Date",
-      "Medium",
-      "$100-$200"
-    ];
+  const handleUserResponse = async (response: string) => {
+    if (isProcessing) return;
     
-    return responses[step] || "";
-  };
-
-  const handleUserResponse = (response: string) => {
-    // Add user message
+    // Añadir mensaje del usuario
     setMessages(prev => [
       ...prev,
       { sender: "user", text: response }
     ]);
     
-    // Update preferences based on the current step
+    // Actualizar la conversación
+    setConversation(prev => [...prev, { role: 'user', content: response }]);
+    
+    // Actualizar preferencias según el tipo de paso actual
     updatePreferences(response, steps[currentStep].type);
     
-    // Move to next step if not at the end
+    // Avanzar al siguiente paso si no estamos al final
     if (currentStep < steps.length - 1) {
       const nextStep = currentStep + 1;
-      setTimeout(() => {
+      setCurrentStep(nextStep);
+      
+      // Mostrar indicador de procesamiento
+      setIsProcessing(true);
+      
+      try {
+        // Intentar obtener la siguiente pregunta del asistente
+        const nextQuestion = await getNextQuestion();
+        
+        // Si tenemos una respuesta del API
+        if (nextQuestion) {
+          setMessages(prev => [
+            ...prev,
+            {
+              sender: "assistant",
+              text: nextQuestion.text,
+              options: nextQuestion.suggestedResponses,
+              type: steps[nextStep].type as any
+            }
+          ]);
+          
+          setConversation(prev => [...prev, { role: 'assistant', content: nextQuestion.text }]);
+          
+          // Reproducir audio de la respuesta
+          playAssistantResponse(nextQuestion.text);
+        } else {
+          // Si no hay respuesta, usar los steps predefinidos
+          setMessages(prev => [
+            ...prev,
+            {
+              sender: "assistant",
+              text: steps[nextStep].question,
+              options: steps[nextStep].options,
+              type: steps[nextStep].type as any
+            }
+          ]);
+          
+          setConversation(prev => [...prev, { role: 'assistant', content: steps[nextStep].question }]);
+          playAssistantResponse(steps[nextStep].question);
+        }
+      } catch (error) {
+        console.error("Error al obtener la respuesta del asistente:", error);
+        
+        // En caso de error, usar los steps predefinidos
         setMessages(prev => [
           ...prev,
           {
@@ -154,13 +310,33 @@ export default function AIAssistantScreen({
             type: steps[nextStep].type as any
           }
         ]);
-        setCurrentStep(nextStep);
-      }, 1000);
+        
+        setConversation(prev => [...prev, { role: 'assistant', content: steps[nextStep].question }]);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
-      // Complete the AI assistant flow
-      setTimeout(() => {
-        onComplete(preferences);
-      }, 2000);
+      // Al finalizar, obtener preferencias analizadas
+      try {
+        const analyzedPreferences = await analyzeUserPreferences(
+          conversation.filter(msg => msg.role === 'user').map(msg => msg.content)
+        );
+        
+        // Combinar preferencias detectadas con las que el usuario ya seleccionó
+        const finalPreferences = {
+          ...preferences,
+          ...analyzedPreferences
+        };
+        
+        setTimeout(() => {
+          onComplete(finalPreferences);
+        }, 2000);
+      } catch (error) {
+        console.error("Error al analizar preferencias:", error);
+        setTimeout(() => {
+          onComplete(preferences);
+        }, 2000);
+      }
     }
   };
 
