@@ -44,8 +44,28 @@ export default function Home() {
     setCurrentScreen("ai-assistant");
   };
   
+  // Clases que aplican efectos translúcidos para el contenido
+  const contentClasses = `
+    max-w-md mx-auto 
+    min-h-screen relative 
+    ${currentScreen !== "splash" ? "backdrop-blur-sm bg-white/30 border-x border-[#16deca]/20 shadow-xl" : ""}
+    transition-all duration-500
+  `;
+  
   return (
-    <div id="app" className="max-w-md mx-auto bg-white min-h-screen relative shadow-lg">
+    <div id="app" className={contentClasses}>
+      {/* Elementos decorativos de fondo - sólo visibles cuando no está en splash */}
+      {currentScreen !== "splash" && (
+        <>
+          {/* Resplandor superior */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#FF66C4]/20 to-transparent pointer-events-none z-10"></div>
+          
+          {/* Resplandor inferior */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#16deca]/20 to-transparent pointer-events-none z-10"></div>
+        </>
+      )}
+      
+      {/* Pantallas de la aplicación */}
       {currentScreen === "splash" && (
         <SplashScreen onComplete={handleSplashComplete} />
       )}
@@ -72,6 +92,7 @@ export default function Home() {
         />
       )}
       
+      {/* Navegación inferior - sólo visible en algunas pantallas */}
       {currentScreen !== "splash" && currentScreen !== "ai-assistant" && (
         <BottomNav />
       )}

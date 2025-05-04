@@ -3,9 +3,10 @@ import React from 'react';
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  animated?: boolean;
 }
 
-export default function Logo({ size = 'md', className = '' }: LogoProps) {
+export default function Logo({ size = 'md', className = '', animated = true }: LogoProps) {
   // Definir tamaños
   const sizes = {
     sm: 'w-10 h-10',
@@ -18,16 +19,23 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
   
   return (
     <div className={`${sizeClass} relative ${className}`}>
-      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400 opacity-70 blur-md animate-pulse"></div>
-      <div className="relative w-full h-full rounded-full p-0.5 bg-gradient-to-r from-blue-500 to-cyan-300 shadow-xl">
-        <div className="absolute inset-0 rounded-full overflow-hidden">
-          <img 
-            src="/images/logo.jpg" 
-            alt="Botidinamix Logo" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 rounded-full border border-blue-300 opacity-50"></div>
+      {/* Efecto de resplandor */}
+      <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-[#6610f2] to-[#e83e8c] opacity-70 blur-md ${animated ? 'animate-pulse' : ''}`}></div>
+      
+      {/* Contenedor del logo */}
+      <div className="relative w-full h-full rounded-full overflow-hidden">
+        {/* Imagen del logo */}
+        <img 
+          src="/images/aromasfera-logo.png" 
+          alt="AromaSfera Logo" 
+          className="w-full h-full object-contain relative z-10"
+        />
+        
+        {/* Efecto de brillo */}
+        {animated && <div className="absolute inset-0 shine-effect"></div>}
+        
+        {/* Borde decorativo */}
+        <div className="absolute inset-0 rounded-full border border-[#16deca] opacity-50"></div>
       </div>
     </div>
   );

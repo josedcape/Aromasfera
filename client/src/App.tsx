@@ -22,6 +22,7 @@ function Router() {
 function App() {
   const [audioReady, setAudioReady] = useState(false);
   const [logoReady, setLogoReady] = useState(false);
+  const [appReady, setAppReady] = useState(false);
   
   // Verificar si los archivos existen
   useEffect(() => {
@@ -41,7 +42,7 @@ function App() {
       });
       
     // Verificar logo
-    fetch('/images/logo.jpg')
+    fetch('/images/aromasfera-logo.png')
       .then(response => {
         if (response.ok) {
           setLogoReady(true);
@@ -54,14 +55,21 @@ function App() {
         console.error('Error checking logo file:', error);
         setLogoReady(false);
       });
+      
+    // Simular tiempo de carga de la aplicación
+    const timer = setTimeout(() => {
+      setAppReady(true);
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="app-container relative min-h-screen pb-12">
-        {/* Logo superior */}
+      <div className={`app-container relative min-h-screen ${appReady ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
+        {/* Logo superior - solo visible en algunas rutas */}
         {logoReady && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40">
+          <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-40">
             <Logo size="md" />
           </div>
         )}
