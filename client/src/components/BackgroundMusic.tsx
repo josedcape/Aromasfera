@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { RemixIcon } from '@/components/ui/remixicon';
+import { useMobile } from '@/hooks/use-mobile';
 
 interface BackgroundMusicProps {
   audioUrl: string;
@@ -11,109 +13,109 @@ interface BackgroundMusicProps {
 
 export default function BackgroundMusic({
   audioUrl,
-  autoPlay = true,
+  autoPlay = false,
   loop = true,
-  volume = 0.3
+  volume = 0.5
 }: BackgroundMusicProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(autoPlay);
+  const [currentVolume, setCurrentVolume] = useState(volume);
+  const [showControls, setShowControls] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const isMobile = useMobile();
 
   useEffect(() => {
-    // Crear elemento de audio
-    const audio = new Audio(audioUrl);
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // Configurar audio
+    audio.volume = currentVolume;
     audio.loop = loop;
-    audio.volume = volume;
-    audio.preload = 'auto';
     
-    // Guardar referencia
-    audioRef.current = audio;
-    setAudioElement(audio);
-    
-    // Configurar eventos
-    audio.addEventListener('play', () => setIsPlaying(true));
-    audio.addEventListener('pause', () => setIsPlaying(false));
-    
-    // Intentar reproducir si autoPlay está habilitado
-    if (autoPlay) {
-      // Las políticas de navegadores modernos requieren interacción del usuario
-      // antes de reproducir audio automáticamente
+    // Reproducir o pausar según estado
+    if (isPlaying) {
       const playPromise = audio.play();
-      
       if (playPromise !== undefined) {
-        playPromise.then(() => {
-          // Reproducción automática exitosa
-          setIsPlaying(true);
-        }).catch(error => {
-          // La reproducción automática no fue permitida
-          console.log('Autoplay not allowed:', error);
+        playPromise.catch(error => {
+          console.error('Error al reproducir audio:', error);
           setIsPlaying(false);
         });
       }
-    }
-    
-    // Cleanup al desmontar
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      }
-    };
-  }, [audioUrl, autoPlay, loop, volume]);
-  
-  // Controlar reproducción/pausa
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    
-    if (isPlaying) {
-      audioRef.current.pause();
     } else {
-      const playPromise = audioRef.current.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.error('Error playing audio:', error);
-        });
-      }
+      audio.pause();
     }
-  };
-  
-  // Controlar mute/unmute
-  const toggleMute = () => {
-    if (!audioRef.current) return;
-    
-    audioRef.current.muted = !audioRef.current.muted;
-    setIsMuted(!isMuted);
+  }, [isPlaying, currentVolume, loop, audioUrl]);
+
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
   };
 
+  const handleVolumeChange = (newVolume: number[]) => {
+    const volume = newVolume[0];
+    setCurrentVolume(volume);
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  };
+
+  const toggleControls = () => {
+    setShowControls(!showControls);
+  };
+
+  // Posición en la pantalla según dispositivo
+  const positionClass = isMobile 
+    ? "fixed top-20 right-4 z-40" 
+    : "fixed top-6 right-6 z-40";
+
   return (
-    <div className="fixed bottom-24 right-4 z-50 flex flex-col items-center">
-      <div className="bg-black/30 backdrop-blur-md p-2 rounded-full shadow-lg">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={togglePlay}
-          className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-indigo-500 text-white hover:from-purple-500 hover:to-indigo-600"
-          aria-label={isPlaying ? "Pause music" : "Play music"}
-        >
-          <RemixIcon name={isPlaying ? "pause-fill" : "play-fill"} size="xl" />
-        </Button>
-      </div>
+    <>
+      <audio ref={audioRef} src={audioUrl} />
       
-      {isPlaying && (
-        <div className="mt-2 bg-black/30 backdrop-blur-md p-2 rounded-full shadow-lg">
+      <div className={positionClass}>
+        <div className="flex flex-col items-end">
+          {/* Botón principal */}
           <Button
-            variant="ghost"
+            onClick={toggleControls}
+            variant="outline"
             size="icon"
-            onClick={toggleMute}
-            className="w-8 h-8 rounded-full bg-gradient-to-r from-gray-700 to-gray-900 text-white hover:from-gray-800 hover:to-gray-950"
-            aria-label={isMuted ? "Unmute" : "Mute"}
+            className="h-10 w-10 rounded-full bg-black/30 backdrop-blur-md border-blue-400/30 text-white hover:bg-black/40 hover:text-blue-300"
           >
-            <RemixIcon name={isMuted ? "volume-mute-fill" : "volume-up-fill"} />
+            <RemixIcon 
+              name={showControls ? "close-line" : "music-2-line"} 
+              size="lg" 
+              className="text-blue-300" 
+            />
           </Button>
+          
+          {/* Controles expandidos */}
+          {showControls && (
+            <div className="mt-2 p-3 bg-black/50 backdrop-blur-md rounded-xl border border-blue-400/20 flex flex-col gap-2 w-48 animate-in fade-in slide-in-from-top-5 duration-300">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-white/80">Música Ambiente</span>
+                <Button
+                  onClick={togglePlay}
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full text-white hover:bg-white/10"
+                >
+                  <RemixIcon name={isPlaying ? "pause-fill" : "play-fill"} size="lg" />
+                </Button>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <RemixIcon name="volume-down-line" size="sm" className="text-white/70" />
+                <Slider
+                  defaultValue={[currentVolume]}
+                  max={1}
+                  step={0.01}
+                  onValueChange={handleVolumeChange}
+                  className="flex-1"
+                />
+                <RemixIcon name="volume-up-line" size="sm" className="text-white/70" />
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

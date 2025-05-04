@@ -96,6 +96,48 @@
     color: #333333;
   }
   
+  /* Estilos específicos para dispositivos móviles */
+  .mobile-container {
+    @apply px-3 py-2 mx-auto max-w-full;
+  }
+  
+  .mobile-card {
+    @apply rounded-lg shadow-sm p-3;
+  }
+  
+  .mobile-text {
+    @apply text-sm leading-tight;
+  }
+  
+  .mobile-button {
+    @apply px-3 py-1.5 text-sm rounded-full;
+  }
+  
+  .mobile-input {
+    @apply text-sm py-1.5 px-2 rounded-md;
+  }
+  
+  .mobile-heading {
+    @apply text-xl font-bold leading-tight mb-2;
+  }
+  
+  /* Estilos para botones flotantes */
+  .fab-container {
+    @apply fixed z-50 flex flex-col-reverse items-center space-y-2 space-y-reverse;
+  }
+  
+  .fab-button {
+    @apply rounded-full shadow-lg flex items-center justify-center transition-all duration-300;
+  }
+  
+  .fab-main {
+    @apply w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white;
+  }
+  
+  .fab-secondary {
+    @apply w-12 h-12 text-white;
+  }
+  
   /* Pulse animation for the AI assistant */
   @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.7); }

@@ -1,30 +1,35 @@
-import React from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { cn } from '@/lib/utils';
 
-interface RemixIconProps extends React.HTMLAttributes<HTMLElement> {
+// Tipos de tamaños disponibles
+type IconSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+
+interface RemixIconProps {
   name: string;
+  size?: IconSize;
   className?: string;
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 }
 
-const sizeClasses = {
-  xs: "text-xs",
-  sm: "text-sm",
-  md: "text-base",
-  lg: "text-lg",
-  xl: "text-xl",
-  "2xl": "text-2xl",
-  "3xl": "text-3xl",
-};
-
-export function RemixIcon({ name, className, size = "md", ...props }: RemixIconProps) {
-  const iconClass = `ri-${name}`;
-  const sizeClass = sizeClasses[size] || sizeClasses.md;
+export function RemixIcon({ 
+  name, 
+  size = 'md', 
+  className 
+}: RemixIconProps) {
+  // Mapeo de tamaños a clases
+  const sizeClasses = {
+    'sm': 'text-sm',
+    'md': 'text-base',
+    'lg': 'text-lg',
+    'xl': 'text-xl',
+    '2xl': 'text-2xl',
+    '3xl': 'text-3xl'
+  };
   
   return (
-    <i 
-      className={cn(iconClass, sizeClass, className)} 
-      {...props}
-    />
+    <i className={cn(
+      `ri-${name}`,
+      sizeClasses[size],
+      className
+    )}></i>
   );
 }

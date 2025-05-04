@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import BackgroundMusic from "@/components/BackgroundMusic";
 import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
+import FloatingActionButtons from "@/components/FloatingActionButtons";
 import { useState, useEffect } from "react";
 
 function Router() {
@@ -70,6 +71,9 @@ function App() {
         
         {/* Elementos de UI */}
         <Toaster />
+        
+        {/* Botones flotantes - acciones rápidas */}
+        <FloatingActionButtons />
         
         {/* Reproductor de música */}
         {audioReady && (
