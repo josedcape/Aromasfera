@@ -6,6 +6,8 @@ import {
   FragranceType, 
   Occasion 
 } from "@/lib/utils";
+import { useSpeechRecognition } from "@/lib/speechRecognition";
+import { sendMessageToAssistant, textToSpeech, ConversationMessage } from "@/lib/apiService";
 
 type Message = {
   sender: "user" | "assistant";

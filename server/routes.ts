@@ -4,10 +4,14 @@ import { db } from "@db";
 import { 
   perfumes, 
   emailSubscriptions, 
-  insertEmailSubscriptionSchema
+  insertEmailSubscriptionSchema,
+  UserPreferences
 } from "@shared/schema";
 import { eq, and, or, inArray, desc } from "drizzle-orm";
 import { z } from "zod";
+import { analyzeUserPreferences, generateNextQuestion } from "./services/aiService";
+import { textToSpeechConverter } from "./services/textToSpeech";
+import crypto from 'crypto';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -115,6 +119,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error('Error creating subscription:', error);
       res.status(500).json({ message: 'Failed to process subscription' });
+    }
+  });
+
+  // Endpoint para enviar mensajes al asistente y obtener una respuesta
+  app.post('/api/assistant/message', async (req, res) => {
+    try {
+      const messageSchema = z.object({
+        conversation: z.array(z.object({
+          role: z.enum(['user', 'assistant']),
+          content: z.string()
+        })),
+        currentStep: z.number().int().min(0).max(7)
+      });
+      
+      const parsed = messageSchema.safeParse(req.body);
+      
+      if (!parsed.success) {
+        return res.status(400).json({ 
+          message: "Invalid request format", 
+          errors: parsed.error.errors 
+        });
+      }
+      
+      const { conversation, currentStep } = parsed.data;
+      
+      // Generar respuesta usando el servicio de AI
+      const response = await generateNextQuestion(conversation, currentStep);
+      
+      // Si se ha configurado la síntesis de voz, convertir texto a voz
+      if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        try {
+          const filename = `assistant_response_${crypto.randomBytes(8).toString('hex')}`;
+          const audioUrl = await textToSpeechConverter(response.text, filename);
+          
+          // Devolver la respuesta con la URL del audio
+          return res.json({
+            ...response,
+            audioUrl
+          });
+        } catch (error) {
+          console.error('Error in text-to-speech conversion:', error);
+          // Continuar y devolver solo la respuesta de texto si hay un error en la síntesis
+          return res.json(response);
+        }
+      }
+      
+      // Devolver solo la respuesta de texto
+      return res.json(response);
+    } catch (error) {
+      console.error('Error in assistant message endpoint:', error);
+      res.status(500).json({ message: 'Failed to process assistant message' });
+    }
+  });
+  
+  // Endpoint para analizar las preferencias del usuario
+  app.post('/api/assistant/analyze', async (req, res) => {
+    try {
+      const schema = z.object({
+        messages: z.array(z.object({
+          role: z.enum(['user', 'assistant']),
+          content: z.string()
+        }))
+      });
+      
+      const parsed = schema.safeParse(req.body);
+      
+      if (!parsed.success) {
+        return res.status(400).json({ 
+          message: "Invalid request format", 
+          errors: parsed.error.errors 
+        });
+      }
+      
+      const { messages } = parsed.data;
+      
+      // Extraer solo los mensajes del usuario
+      const userMessages = messages
+        .filter(msg => msg.role === 'user')
+        .map(msg => msg.content);
+      
+      // Analizar preferencias usando el servicio de AI
+      const preferences = await analyzeUserPreferences(userMessages);
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error('Error analyzing user preferences:', error);
+      res.status(500).json({ message: 'Failed to analyze user preferences' });
+    }
+  });
+  
+  // Endpoint para la síntesis de voz
+  app.post('/api/assistant/speak', async (req, res) => {
+    try {
+      const schema = z.object({
+        text: z.string().min(1),
+        language: z.string().default('es-ES')
+      });
+      
+      const parsed = schema.safeParse(req.body);
+      
+      if (!parsed.success) {
+        return res.status(400).json({ 
+          message: "Invalid request format", 
+          errors: parsed.error.errors 
+        });
+      }
+      
+      const { text, language } = parsed.data;
+      
+      if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        return res.status(503).json({ 
+          message: "Text-to-speech service is not configured" 
+        });
+      }
+      
+      // Generar un nombre de archivo único
+      const filename = `voice_${crypto.randomBytes(8).toString('hex')}`;
+      
+      // Convertir texto a voz
+      const audioUrl = await textToSpeechConverter(text, filename, language);
+      
+      res.json({ audioUrl });
+    } catch (error) {
+      console.error('Error in text-to-speech endpoint:', error);
+      res.status(500).json({ message: 'Failed to convert text to speech' });
     }
   });
 
