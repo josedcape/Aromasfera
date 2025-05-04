@@ -594,24 +594,24 @@ export default function AIAssistantScreen({
       </div>
 
       {/* Input Area */}
-      <div className="bg-[#36219c]/70 backdrop-blur-md border-t border-[#16deca]/30 p-4 sticky bottom-0 z-10">
+      <div className="bg-gray-900/70 backdrop-blur-md border-t border-gray-700/50 p-4 sticky bottom-0 z-10">
         <div className="max-w-3xl mx-auto">
           <form onSubmit={handleSubmit} className="flex items-center relative">
             <button 
               type="button" 
-              className="p-2 text-[#f0f0f0]/70 hover:text-[#FF66C4] transition-colors rounded-full hover:bg-[#36219c]/50 border border-transparent hover:border-[#16deca]/30"
+              className="p-2 text-gray-400 hover:text-purple-400 transition-colors rounded-full hover:bg-gray-800/50"
             >
               <RemixIcon name="emotion-line" size="xl" />
             </button>
             
             {/* Input field with glowing effect */}
-            <div className="flex-1 bg-[#36219c]/50 rounded-2xl border border-[#16deca]/40 px-4 py-3 mx-2 flex items-center focus-within:border-[#FF66C4]/50 transition-all group relative overflow-hidden shadow-inner shadow-[#16deca]/10">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#16deca]/10 to-[#FF66C4]/10 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"></div>
+            <div className="flex-1 bg-black/30 rounded-2xl border border-gray-700 px-4 py-3 mx-2 flex items-center focus-within:border-blue-500/50 transition-all group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"></div>
               
               {/* Glowing border effect when focused */}
-              <div className="absolute inset-0 rounded-2xl border border-[#FF66C4]/70 opacity-0 group-focus-within:opacity-100 transition-opacity border-glow"></div>
+              <div className="absolute inset-0 rounded-2xl border border-blue-500/70 opacity-0 group-focus-within:opacity-100 transition-opacity border-glow"></div>
               
-              <RemixIcon name="message-3-line" className="text-[#f0f0f0]/50 mr-2" />
+              <RemixIcon name="message-3-line" className="text-gray-500 mr-2" />
               <input 
                 type="text" 
                 placeholder="Escribe tu mensaje o usa el micrófono..." 
@@ -625,7 +625,7 @@ export default function AIAssistantScreen({
             {currentInput.trim() ? (
               <button 
                 type="submit" 
-                className="p-3 rounded-full bg-gradient-to-r from-[#16deca] to-[#FF66C4] text-white shadow-lg shadow-[#FF66C4]/30 border border-[#16deca]/50 hover:shadow-[#FF66C4]/50 hover:scale-105 transition-all relative overflow-hidden group"
+                className="p-3 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 border border-blue-400/30 hover:shadow-blue-500/50 hover:scale-105 transition-all relative overflow-hidden group"
               >
                 <div className="absolute inset-0 sheen-effect opacity-0 group-hover:opacity-100"></div>
                 <RemixIcon name="send-plane-fill" size="lg" className="z-10 relative" />
@@ -634,8 +634,8 @@ export default function AIAssistantScreen({
               <button 
                 type="button" 
                 className={`p-3 rounded-full relative overflow-hidden ${isListening 
-                  ? 'bg-gradient-to-r from-[#FF66C4] to-[#FF9F5B] shadow-lg shadow-[#FF66C4]/30 border border-[#FF66C4]/40 text-white animate-pulse' 
-                  : 'bg-gradient-to-r from-[#16deca] to-[#36219c] shadow-lg shadow-[#16deca]/30 border border-[#16deca]/40 text-white hover:shadow-[#16deca]/50 hover:scale-105 group'
+                  ? 'bg-gradient-to-br from-pink-500 to-red-500 shadow-lg shadow-pink-500/30 border border-pink-400/30 text-white animate-pulse' 
+                  : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/30 border border-blue-400/30 text-white hover:shadow-blue-500/50 hover:scale-105 group'
                 } transition-all`}
                 onClick={handleVoiceInput}
               >
@@ -647,18 +647,12 @@ export default function AIAssistantScreen({
           
           {/* Small hint text */}
           <div className="text-center mt-2">
-            <p className="text-xs text-[#f0f0f0]/60 font-accent">
+            <p className="text-xs text-gray-500">
               Habla o escribe con AromaSfera para descubrir tu perfume ideal
             </p>
           </div>
-          
-          {/* Línea decorativa */}
-          <div className="absolute left-0 right-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#16deca]/50 to-transparent"></div>
         </div>
       </div>
-      
-      {/* Efecto de onda en la parte inferior */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#16deca]/30 via-[#FF66C4]/30 to-[#FF9F5B]/30 opacity-50"></div>
     </div>
   );
 }
