@@ -12,9 +12,14 @@ import { z } from "zod";
 import { analyzeUserPreferences, generateNextQuestion } from "./services/aiService";
 import { textToSpeechConverter } from "./services/textToSpeech";
 import crypto from 'crypto';
+import express from 'express';
+import path from 'path';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
+  
+  // Servir archivos estáticos de audio
+  app.use('/audio', express.static(path.join(import.meta.dirname, 'public', 'audio')));
   
   // Get perfume recommendations based on user preferences
   app.get('/api/recommendations', async (req, res) => {
